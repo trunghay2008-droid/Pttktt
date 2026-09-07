@@ -1,0 +1,210 @@
+"""
+================================================================================
+BÀI TẬP VỀ NHÀ - BÀI 2: PHÂN TÍCH ĐỘ PHỨC TẠP THUẬT TOÁN
+By: Hoàng việt hùng
+================================================================================
+
+TÀI LIỆU NÀY GỒM 2 PHẦN:
+1. CODE MÔ PHỎNG & ĐỐI CHIẾU THỰC NGHIỆM ĐOẠN MÃ GIẢ (BÀI TẬP 2)
+2. TOÀN BỘ LỜI GIẢI CHI TIẾT & CHỨNG MINH TOÁN HỌC (BÀI TẬP 1 & 2)
+"""
+
+import sys
+
+# Đảm bảo in tiếng Việt có dấu mượt mà trên mọi terminal Windows
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
+# ==============================================================================
+# PHẦN 1: MÔ PHỎNG THUẬT TOÁN EXAMPLE(A) & ĐẾM PHÉP TOÁN THỰC TẾ
+# ==============================================================================
+
+def example_algorithm(A):
+    """
+    Cài đặt thuật toán theo đúng đoạn mã giả trong đề bài:
+    Algorithm Example(A[1..n])
+        sum <- 0
+        for i <- 1 to n do
+            for j <- 1 to i do
+                sum <- sum + A[j]
+            end for
+        end for
+        return sum
+    """
+    total_sum = 0
+    n = len(A)
+    for i in range(1, n + 1):          # i chạy từ 1 đến n
+        for j in range(1, i + 1):      # j chạy từ 1 đến i
+            total_sum = total_sum + A[j - 1] # Index trong Python từ 0
+    return total_sum
+
+
+def example_with_counters(n):
+    """
+    Mô phỏng thuật toán Example và đếm chính xác số phép gán, phép cộng thực tế
+    được thực thi khi n thay đổi.
+    """
+    # Mảng A kích thước n (giả sử A[k] = 1 với mọi k)
+    A = [1] * n
+    
+    so_phep_gan_sum = 0
+    so_phep_cong_sum = 0
+    
+    # sum <- 0 (1 phép gán ban đầu)
+    total_sum = 0
+    so_phep_gan_sum += 1
+    
+    for i in range(1, n + 1):
+        for j in range(1, i + 1):
+            # sum <- sum + A[j]
+            so_phep_cong_sum += 1  # 1 phép cộng
+            total_sum = total_sum + A[j - 1]
+            so_phep_gan_sum += 1   # 1 phép gán lại vào sum
+            
+    return total_sum, so_phep_gan_sum, so_phep_cong_sum
+
+
+# ==============================================================================
+# PHẦN 2: BẢN IN LỜI GIẢI ĐẦY ĐỦ VÀ KIỂM CHỨNG THỰC TẾ
+# ==============================================================================
+
+def in_loi_giai_chi_tiet():
+    loi_giai = """
+================================================================================
+                    LỜI GIẢI CHI TIẾT BÀI TẬP VỀ NHÀ - BÀI 2
+================================================================================
+
+--------------------------------------------------------------------------------
+BÀI TẬP 1: CÁC PHÁT BIỂU VỀ HAI HÀM f(n) VÀ g(n)
+--------------------------------------------------------------------------------
+
+Câu 1: Nếu f(n) = Θ(g(n)) thì khẳng định nào sau đây luôn đúng?
+   A. f(n) = O(g(n))
+   B. f(n) = Ω(g(n))
+   C. Cả A và B đúng
+   D. Cả A và B đều sai
+
+   >>> ĐÁP ÁN ĐÚNG: C. Cả A và B đúng
+   >>> Giải thích chi tiết:
+       Theo định nghĩa chuẩn của ký hiệu Big-Theta (Θ):
+       f(n) = Θ(g(n)) khi và chỉ khi tồn tại các hằng số dương c1, c2 và n0 sao cho:
+           0 <= c1 * g(n) <= f(n) <= c2 * g(n)   với mọi n >= n0
+       - Bất đẳng thức f(n) <= c2 * g(n) chính là định nghĩa của f(n) = O(g(n)) (chặn trên).
+       - Bất đẳng thức f(n) >= c1 * g(n) chính là định nghĩa của f(n) = Ω(g(n)) (chặn dưới).
+       Vì vậy, f(n) = Θ(g(n)) đồng nghĩa f(n) vừa là O(g(n)) vừa là Ω(g(n)). Do đó Cả A và B đều đúng.
+
+
+Câu 2: Nếu f(n) = O(g(n)) và g(n) = O(f(n)) thì có thể kết luận gì về mối quan hệ giữa f(n) và g(n)?
+
+   >>> KẾT LUẬN: f(n) = Θ(g(n)) (và g(n) = Θ(f(n))).
+   >>> Giải thích chi tiết:
+       - f(n) = O(g(n))  => Tồn tại c2 > 0, n1 sao cho f(n) <= c2 * g(n) với mọi n >= n1.
+       - g(n) = O(f(n))  => Tồn tại c' > 0, n2 sao cho g(n) <= c' * f(n) với mọi n >= n2.
+                            Biến đổi: f(n) >= (1/c') * g(n). Đặt c1 = 1/c' > 0.
+       - Kết hợp cả hai bất đẳng thức với n0 = max(n1, n2):
+           c1 * g(n) <= f(n) <= c2 * g(n)   với mọi n >= n0
+       => Theo định nghĩa, f(n) = Θ(g(n)).
+       Điều này có nghĩa là f(n) và g(n) có cùng bậc tăng trưởng tiệm cận (asymptotically of the same order).
+
+
+Câu 3: Xét hai hàm:
+       f(n) = 3n² + 10n
+       g(n) = n²
+       Hãy xác định mối quan hệ chính xác giữa f(n) và g(n) theo các ký hiệu O, Ω, Θ.
+
+   >>> KẾT QUẢ CHÍNH XÁC: f(n) = Θ(g(n)) (đồng thời f(n) = O(g(n)) và f(n) = Ω(g(n)))
+   >>> Chứng minh chặt chẽ:
+       Xét tỷ số giới hạn khi n tiến ra vô cùng:
+           lim (n->∞) [f(n) / g(n)] = lim (n->∞) [(3n² + 10n) / n²]
+                                    = lim (n->∞) [3 + 10/n] = 3.
+       Vì 0 < 3 < ∞ (giới hạn là một số thực dương hữu hạn):
+       => f(n) và g(n) có cùng bậc tăng trưởng tiệm cận.
+       
+       Chứng minh cụ thể theo định nghĩa:
+       Với mọi n >= 1:
+           - Chặn dưới: f(n) = 3n² + 10n >= 3n² = 3 * g(n)   (chọn c1 = 3)
+           - Chặn trên: f(n) = 3n² + 10n <= 3n² + 10n² = 13n² = 13 * g(n)   (chọn c2 = 13)
+       Vậy:
+           3 * g(n) <= f(n) <= 13 * g(n)   với mọi n >= 1 (n0 = 1, c1 = 3, c2 = 13)
+       Kết luận:
+           * f(n) = O(g(n)) hay f(n) = O(n²)
+           * f(n) = Ω(g(n)) hay f(n) = Ω(n²)
+           * Mối quan hệ chính xác và chặt chẽ nhất là: f(n) = Θ(g(n)) hay f(n) = Θ(n²).
+
+--------------------------------------------------------------------------------
+BÀI TẬP 2: PHÂN TÍCH ĐỘ PHỨC TẠP CỦA ĐOẠN MÃ GIẢ
+--------------------------------------------------------------------------------
+Mã giả:
+Algorithm Example(A[1..n])
+    sum <- 0
+    for i <- 1 to n do
+        for j <- 1 to i do
+            sum <- sum + A[j]
+        end for
+    end for
+    return sum
+
+Yêu cầu 1: Phân tích số lần thực hiện phép gán / cộng trong đoạn mã:
+   - Dòng lệnh "sum <- 0" (khởi tạo ngoài vòng lặp):
+     + Thực hiện đúng 1 phép gán.
+   - Thân vòng lặp bên trong: câu lệnh "sum <- sum + A[j]":
+     + Ở mỗi bước lặp của j, thực hiện: 1 phép cộng (+) và 1 phép gán (<-) vào biến sum.
+     + Với mỗi giá trị i cố định (i chạy từ 1 đến n), vòng lặp trong chạy j từ 1 đến i,
+       tức là lặp đúng i lần.
+     + Tổng số lần thực thi thân vòng lặp trong là:
+           S = ∑ (i từ 1 đến n) i = 1 + 2 + 3 + ... + n = n*(n + 1) / 2 = (n² + n) / 2.
+   - Tổng kết:
+     * Tổng số phép cộng:
+       N_cong = n*(n + 1) / 2 = (n² + n) / 2
+     * Tổng số phép gán (của biến sum):
+       N_gan = 1 (khởi tạo ban đầu) + n*(n + 1) / 2 = 1 + (n² + n) / 2
+
+Yêu cầu 2: Viết công thức tổng số phép toán theo n:
+   - Nếu xét tổng số phép toán dữ liệu cốt lõi (phép cộng và phép gán cho sum):
+       T(n) = N_cong + N_gan
+            = [n*(n + 1) / 2] + [1 + n*(n + 1) / 2]
+            = n*(n + 1) + 1
+            = n² + n + 1
+   - Nếu tính chi tiết toàn bộ (bao gồm cả khởi tạo biến đếm, so sánh điều kiện lặp, tăng biến đếm):
+       + Biến đếm i: gán i=1 (1 lần), so sánh i<=n (n+1 lần), tăng i (n lần).
+       + Biến đếm j: gán j=1 (n lần), so sánh j<=i (∑(i+1) = n*(n+1)/2 + n lần), tăng j (n*(n+1)/2 lần).
+       + Truy xuất mảng A[j] (n*(n+1)/2 lần).
+       => Tổng số phép toán vẫn là một đa thức bậc hai có dạng: T_full(n) = a*n² + b*n + c.
+
+Yêu cầu 3: Xác định độ phức tạp tiệm cận theo ký hiệu O, Ω, Θ:
+   Vì tổng số phép toán T(n) = n² + n + 1 là một đa thức bậc 2 theo n:
+   - Bậc cao nhất là n².
+   - Giới hạn: lim (n->∞) [T(n) / n²] = lim (n->∞) [(n² + n + 1) / n²] = 1.
+   Do đó:
+   - Chặn trên tiệm cận:   T(n) = O(n²)
+   - Chặn dưới tiệm cận:   T(n) = Ω(n²)
+   - Chặn chặt (chính xác): T(n) = Θ(n²)
+================================================================================
+"""
+    print(loi_giai)
+
+
+def kiem_chung_thuc_nghiem():
+    print("=" * 80)
+    print(f"{'BẢNG KIỂM CHỨNG THỰC TẾ CÔNG THỨC SỐ PHÉP TOÁN (BÀI 2)':^80}")
+    print("=" * 80)
+    print(f"{'n':<8} | {'Số phép cộng':<15} | {'Số phép gán sum':<18} | {'Công thức n(n+1)/2':<20} | {'Khớp lý thuyết?'}")
+    print("-" * 80)
+    
+    test_cases = [1, 2, 5, 10, 50, 100, 500]
+    for n in test_cases:
+        _, phep_gan, phep_cong = example_with_counters(n)
+        cong_thuc = n * (n + 1) // 2
+        khop = "HOÀN TOÀN KHỚP" if phep_cong == cong_thuc and phep_gan == cong_thuc + 1 else "Sai lệch"
+        print(f"{n:<8} | {phep_cong:<15} | {phep_gan:<18} | {cong_thuc:<20} | {khop}")
+    print("=" * 80)
+    print("-> Kết luận: Số phép cộng thực nghiệm luôn bằng chính xác n*(n+1)/2.")
+    print("-> Số phép gán cho biến sum luôn bằng chính xác n*(n+1)/2 + 1.\n")
+
+
+if __name__ == "__main__":
+    in_loi_giai_chi_tiet()
+    kiem_chung_thuc_nghiem()
